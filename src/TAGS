@@ -1,0 +1,77 @@
+
+UartWire.h,940
+#    define UartWire_h8,169
+typedef uint8_t    u8t;10,193
+typedef int16_t    i16t;11,217
+typedef uint16_t   u16t;12,242
+typedef uint32_t   u32t;13,267
+typedef int32_t    i32t;14,292
+#define USE_ESP32 17,372
+#define USE_MEGA2560 18,395
+   ePIN_LED 21,458
+   ePIN_SCOPE 22,482
+   ePIN_RX1 23,506
+   ePIN_TX1 24,530
+   W1_SINGLE_DROP 29,602
+   W1_MULTI_DROP 30,655
+   W1_DS18B20 31,678
+   W1_BUTTON 32,733
+   ALARM_SEARCH 36,774
+   CONVERT_T 37,798
+   COPY_PAD 38,822
+   MATCH_ROM 39,846
+   READ_PAD 40,894
+   READ_POWER 41,918
+   READ_ROM 42,942
+   RECALL 43,966
+   SEARCH_ROM 44,990
+   SKIP_ROM 45,1014
+   WRITE_PAD 46,1038
+   ARRAY_LSB 50,1073
+   ARRAY_MSB 51,1091
+   ARRAY_TH 52,1109
+   ARRAY_TL 53,1137
+   ARRAY_CFG 54,1155
+   ARRAY_xFF 55,1191
+   ARRAY_RSV 56,1221
+   ARRAY_x10 57,1251
+   ARRAY_CRC 58,1281
+   ARRAY_PAD_SZ 59,1327
+   ARRAY_ROM_SZ 60,1370
+   ARRAY_ROM 61,1405
+   ARRAY_PAD 62,1440
+
+UartWire.cpp,815
+#define UART 32,916
+static u32t baudrate;33,938
+static int W1_ident 34,960
+static int W1_node 35,985
+static int W1_mode 36,1009
+static u8t ubuff[ubuff37,1045
+void uw_init(41,1236
+static int uw_reset(59,1666
+int  uw_list_rom(75,2115
+int uw_next_sample(87,2429
+static void uw_rx_flush(106,2913
+static int uw_tx_echo(116,3292
+static void uw_set_rate(125,3529
+static int uw_tx_bit(144,4096
+static int uw_tx_byte(155,4412
+static int uw_tx_data(169,4754
+static int uw_rx_bit(181,5097
+static int uw_rx_byte(193,5449
+static int uw_rx_data(209,5848
+static u8t uw_crc(221,6155
+static	int uw_select(239,6617
+static int uw_status(254,7067
+static float uw_degrees(265,7477
+static int uw_print_rom(276,7763
+static u8t * uw_drop_addrs(301,8783
+int uw_test_single(324,9842
+static int uw_array(347,10658
+
+main.cpp,88
+void setup(12,246
+void loop(24,540
+void dso_strobe(40,1035
+void blink_pulse(44,1102

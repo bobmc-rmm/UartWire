@@ -1,0 +1,234 @@
+/** \page changes_ UartWire Changelog
+
+\par Doxygen Procedures
+- cd ~/pio/UartWire/UW1
+- cmd: doxygen Doxyfile or doxywizard Doxyfile
+
+\par bm2021-oct-25
+- V01 Release
+- First version of UartWire
+- see \ref notes_install_
+- Get Doxygen to generate html document set with schematics
+
+== changes_ */
+
+
+//--------------------------------------------------------------------
+/**  @mainpage 
+
+\anchor top_
+
+  \par UartWire Introduction
+
+   UartWire implements a UART driver as Master for a 1-wire bus. It
+   uses the UART shift registers so the MCU does not need to do
+   tedious bit-banging or interrupt modification. See \ref
+   notes_install_ for added details
+
+   UartWire is based on Maxim App Note 214. See App 126 for bit-banging.
+
+\par Technology
+
+ -  ESP32, Arduino Mega2560,
+ -  Maxim DS18B20 1-wire temperature in C degrees
+ -  PlatformIO
+
+.. | Information
+:--------- | :----------------------------
+Project    | UART 1-wire driver (no bit-bang)
+License    | Open Source
+Version    | (release candidate 01)
+Author     | Robert M. McIsaac; Software Designer
+Date       | 2021.Oct.25
+<br>
+\todo
+  - nodemcuv2 .. Amica enhanced ESP8266
+
+\note
+  - See \ref changes_ for daily changelog
+  - See Related Pages for change summaries
+  - See \ref uw_init as starting point for program code
+
+end Mainpage 
+*/ 
+
+/** \page notes_install_ Installation
+
+<BR>
+
+\verbatim
+
+   Typical MCUs include logic for I2C, SPI, and UART. There are shift
+   registers in these logic blocks for adapting the MCU bytes to
+   serial signals on various GPIO pins. The processors of ancient
+   computers such as the IBM PC had discrete chips for serial I/O.
+   Economy computers designed for home use did not have these discrete
+   chips. They did serial I/O by "bit-banging".
+
+   Maxim offers ICs for 1-wire but they are not breadboard
+   friendly. So Arduino depends upon bit-banging libraries to generate
+   1wire timings. They disable interrupts to maintain timings. This
+   does not matter for trivial projects but may be vulnerable to
+   erratic bugs when multiple devices need to work in real-time.
+   Fortunately, UartWire has an 8to1 advantage over the MCU demand
+   imposed by bit-banging.
+   
+\endverbatim
+<BR>
+ 
+\par Development Tools (PlatformIO)
+
+\verbatim
+
+   UartWire is packaged for PlatformIO. The two MCUs tested so far
+   depend upon Arduino APIs so it should be easy to switch over to the
+   Arduino IDE, if that is preferred. MCUs added in future may not use
+   the Arduino packages.
+
+   Pio may try to compile for everything in the "platformio.ini" but
+   that is not applicable to UartWire requirements. Instead there is a
+   Linux Bash shell script for each MCU. The script runs a menu loop
+   to save retyping Pio commands.
+
+   The UartWire code is C++ but there are no objects, classes, or
+   namespaces. There are no class methods, just C-like functions which
+   should compile on most platfroms.
+
+\endverbatim
+<BR>
+
+\par MCU Boards
+
+\verbatim
+   UartWire was developed for Adafruit Feather ESP32 using PlatformIO
+   Arduino framework. It could also be done with the Arduino IDE by
+   changing main.cpp to main.ino. Some ESP32 boards require the
+   Espressif ESP-IDF. PlatformIO has a framework for that.
+   
+   Legacy AVR boards do not have a UART for auxiliary Serial port. The
+   MEGA2560 has three ports. However, the Arduino HardwareSerial does
+   not have updateBaudRate() like the ESP32 version. Fortunately, the
+   baud rate is changed by calling begin(baud,SERIALl8N1) whenever
+   needed.
+
+   The adafruit_feather_m0 has an auxiliary UART which also lacks a
+   baud-rate update. I developed a patch which adds an update
+   method. It required editing the core Uart class or replacing the
+   class files.  But it works.
+
+\endverbatim
+<BR>
+ 
+\par Mapping The 1wire Bus
+
+\verbatim
+
+   Initial testing should be done with the MCU and a single 1wire
+   sensor on a breadboard. Use a short jumper wire to connect
+   them. Maxim 214 suggests to have a resistor joining the UART TX and
+   RX pins and a jumper from RX to the DQ pin of the DS18B20 or other
+   1wire device.  Since the TX signal is both pull-up and pull-down,
+   the standard 4.7k is too much. I found that 820 ohms works ok.
+
+   This non-standard 1wire connection is for devices local to the MCU.
+   Schematics for robust remote connections will be included in this
+   package. 
+   
+   UartWire operates in one of two modes: -- Single-Drop or Multi-Drop.
+   Multidrop is essential when there is more than one sensor installed.
+   But first, SingleDrop must be used to discover the ROM addresses one
+   at a time and assign them to bus nodes 1...N. SingleDrop issues the
+   SKIP_ROM command so that it can operate any single device on the bus.
+
+   The application loop should call (uw_test_single);
+
+   Here is a snippet of the SingleDrop run. It prints the discovered
+   8byte address and some measurements which are nine bytes.
+   
+   [:28:64:26:62:0d:00:00:e2] :e2 N=0 
+   [:98:01:4b:46:7f:ff:08:10:22] :22 25.50  N=0 
+   [:98:01:4b:46:7f:ff:08:10:22] :22 25.50  N=0 
+   [:99:01:4b:46:7f:ff:07:10:79] :79 25.56  N=0 
+   [:98:01:4b:46:7f:ff:08:10:22] :22 25.50  N=0 
+
+   Save the 8byte ROM lines in a temporary file. When all have been tested,
+   paste the ROM lines into routine (uw_drop_addrs).
+      
+\endverbatim
+  uw_test_single() .. uw_drop_addrs() .. uw_print_rom()
+<BR>  
+
+\par  Addressing the 1wire nodes
+
+\verbatim
+
+   After the 1wire components are identified and the data in
+   (uw_drop_addrs) is updated, the application loop should call
+    (uw_list_rom). This is optional step which lists the 1wire nodes
+   without activating the hardware.
+
+   [:28:64:26:62:0d:00:00:e2] :e2 N=1 
+   [:28:72:32:e9:0d:00:00:25] :25 N=2 
+   [:28:2a:5d:62:0d:00:00:99] :99 N=3 
+
+   Terminating...
+   Thanks for using picocom
+   bobmc@ASROCK:~/pio/UartWire$
+
+\endverbatim
+   uw_list_rom()
+<BR>
+
+\par Processing 1wire data
+
+\verbatim
+
+   Now the software and hardware should be ready to go.  The
+   application should loop on (uw_next_sample). There is a fixed delay
+   of 800 milliseconds in the loop to allow for analog to digital
+   conversion of the 1wire measurement.  This delay can be reduced if
+   some other devices need to be updated.  For example, a weather
+   station.
+
+   Terminal ready
+   [:93:01:4b:46:7f:ff:0d:10:32] :32 25.19  N=1 
+   [:95:01:4b:46:7f:ff:0b:10:0b] :0b 25.31  N=2 
+   [:88:01:4b:46:7f:ff:08:10:76] :76 24.50  N=3 
+
+\endverbatim
+   uw_next_sample()
+    <BR>
+
+\par Adapting UART Pins To 1-Wire
+
+\verbatim
+
+   The UART has separate pins for TX (output) and RX (input). These must be
+   combined for 1-wire operation. There are options.
+  
+   The simplest solution is shown in Maxim App 214 where a 820 ohm
+   resistor connects TX to RX and RX also connects to the DQ line. The
+   TX resistor acts as pullup when TX is idle and pulldown when TX is
+   active.  The best value is experimental. So this simple solution is
+   good enough for a local sensor only. It is not for long cables.
+
+   A better solution would use a bus-driver IC such as SN74LS07N which
+   is a HEX non-inverting open collector hex ( 6-part ) buffer. Two
+   inputs are needed for the 1wire and the four unused inputs should
+   be grounded. The IC name suggests an old-school TTL but it is CMOS
+   in the same DIP footprint.
+
+   An adapter using comparator LM2903 is also shown. This 8pin DIP
+   operates with DC volts 2 ... 36, has an open-collector 20ma sink,
+   and can be inverting or non-inverting. It isolates the MCU GPIO
+   pins from spikes on the bus.
+
+\endverbatim
+<BR>
+
+\image html Buff1wire.png
+<BR>
+   
+\image html     UWadapter.png
+
+*/
