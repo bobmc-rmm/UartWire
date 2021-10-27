@@ -4,7 +4,7 @@
 - cd ~/pio/UartWire/UW1
 - cmd: doxygen Doxyfile or doxywizard Doxyfile
 
-\par bm2021-oct-25
+\par bm2021-oct-26
 - V01 Release
 - First version of UartWire
 - see \ref notes_install_
@@ -39,7 +39,7 @@ Project    | UART 1-wire driver (no bit-bang)
 License    | Open Source
 Version    | (release candidate 01)
 Author     | Robert M. McIsaac; Software Designer
-Date       | 2021.Oct.25
+Date       | 2021.Oct.26
 <br>
 \todo
   - nodemcuv2 .. Amica enhanced ESP8266
@@ -226,9 +226,9 @@ end Mainpage
 \endverbatim
 <BR>
 
-\image html Buff1wire.png
+\image html KiCadLS07.png
 <BR>
    
-\image html     UWadapter.png
+\image html KiCadLM2903.png
 
 */
