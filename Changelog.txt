@@ -1,8 +1,15 @@
 /** \page changes_ UartWire Changelog
 
 \par Doxygen Procedures
-- cd ~/pio/UartWire/UW1
+- cd ~/pio/UartWire/UW..
 - cmd: doxygen Doxyfile or doxywizard Doxyfile
+
+\par bm2021-nov-01
+- V02 Release
+- added NodeMcuv2 8266ex to platformio.ini
+- updated "MCU Boards" description
+- replaced several scripts with one script for all
+- menu.sh optionally selects from platformio.ini
 
 \par bm2021-oct-26
 - V01 Release
@@ -37,17 +44,15 @@
 :--------- | :----------------------------
 Project    | UART 1-wire driver (no bit-bang)
 License    | Open Source
-Version    | (release candidate 01)
+Version    | (release candidate 02)
 Author     | Robert M. McIsaac; Software Designer
-Date       | 2021.Oct.26
+Date       | 2021.nov.01
 <br>
-\todo
-  - nodemcuv2 .. Amica enhanced ESP8266
 
 \note
   - See \ref changes_ for daily changelog
   - See Related Pages for change summaries
-  - See \ref uw_init as starting point for program code
+  - See \ref notes_install_ as starting point for program code
 
 end Mainpage 
 */ 
@@ -111,10 +116,18 @@ end Mainpage
    baud rate is changed by calling begin(baud,SERIALl8N1) whenever
    needed.
 
+   ESP8266 come in a variety of forms.  They have an unusual concept
+   of UARTS which has UART1 as TX, no RX.  Since UART1 does not have a
+   receive capability, it must be a "UAT" :-) The NodeMcu 12-E is
+   enhanced with extra GPIO. It changes the UART0 CTS and RTS to
+   become TX2/RX2.  These pins are activating by swapping UART0 from
+   the USB to the fake UART2. UART1 can be used logging via an
+   external USB-serial adapter.
+   
    The adafruit_feather_m0 has an auxiliary UART which also lacks a
    baud-rate update. I developed a patch which adds an update
    method. It required editing the core Uart class or replacing the
-   class files.  But it works.
+   class files.  But the patch (not provided here) works.
 
 \endverbatim
 <BR>
