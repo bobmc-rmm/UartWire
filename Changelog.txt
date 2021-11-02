@@ -1,6 +1,7 @@
 /** \page changes_ UartWire Changelog
 
 \par Doxygen Procedures
+- Get Doxygen to generate html document set with schematics
 - cd ~/pio/UartWire/UW..
 - cmd: doxygen Doxyfile or doxywizard Doxyfile
 
@@ -15,7 +16,6 @@
 - V01 Release
 - First version of UartWire
 - see \ref notes_install_
-- Get Doxygen to generate html document set with schematics
 
 == changes_ */
 
